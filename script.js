@@ -1,40 +1,15 @@
-let Btn = document.getElementById('btn');
-let URLinput = document.querySelector('.URL-input');
-let select = document.querySelector('.opt');
-let serverURL = 'https://dolphin-app-i9mxh.ondigitalocean.app/';
-
-Btn.addEventListener('click', () => {
-	if (!URLinput.value) {
-		alert('Enter YouTube URL');
-	} else {
-		if (select.value == 'mp3') {
-			downloadMp3(URLinput.value);
-		} else if (select.value == 'mp4') {
-			downloadMp4(URLinput.value);
-		}
-	}
+const express = require('express');
+const cors = require('cors');
+const ytdl = require('ytdl-core');
+const app = express();
+app.use(cors());
+app.listen(8080, () => {
+    console.log('Server Works !!! At port 8080');
 });
-
-async function downloadMp3(query) {
-	const res = await fetch(`${serverURL}/downloadmp3?url=${query}`);
-	if(res.status == 200) {
-		var a = document.createElement('a');
-  		a.href = `${serverURL}/downloadmp3?url=${query}`;
-  		a.setAttribute('download', '');
-		a.click();
-	} else if(res.status == 400) {
-		alert("Invalid url");
-	}
-}
-
-async function downloadMp4(query) {
-	const res = await fetch(`${serverURL}/downloadmp4?url=${query}`);
-	if(res.status == 200) {
-		var a = document.createElement('a');
-  		a.href = `${serverURL}/downloadmp4?url=${query}`;
-  		a.setAttribute('download', '');
-		a.click();
-	} else if(res.status == 400) {
-		alert('Invalid url');
-	}
-}
+app.get('/download', (req,res) => {
+var URL = req.query.URL;
+res.header('Content-Disposition', 'attachment; filename="video.mp4"');
+ytdl(URL, {
+    format: 'mp4'
+    }).pipe(res);
+});
